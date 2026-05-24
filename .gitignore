@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 학위논문 검증용 산출물 (외부 사용자가 자기 OSD 이미지로 다시 만들면 됨)
+test_*_output/
+test_*_run*.log
+test_*_gt.txt
+
+# 사용자 출력 디렉터리 (--output 으로 지정되는 작업 디렉터리)
+output/
+extracted/
+extracted_osd*/
+
+# 대용량 raw 이미지
+*.raw
+*.img
+*.001
