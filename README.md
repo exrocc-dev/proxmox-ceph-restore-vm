@@ -38,11 +38,6 @@ python restore_vms.py --osd-dir /path/to/osd/raw/images --output /path/to/output
 
 ---
 
-## 학술 인용
-
-> 석동현, "비활성 상태에서의 분산 객체 스토리지 데이터 회수 방안 — Proxmox-Ceph 환경을 중심으로," 성균관대학교 일반대학원 과학수사학과 석사학위논문, 2026.
-
----
 
 ## 라이선스
 
