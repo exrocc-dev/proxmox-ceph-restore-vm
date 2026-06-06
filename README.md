@@ -1,44 +1,49 @@
 # proxmox-ceph-restore-vm
 
-비활성 Proxmox-Ceph OSD raw 이미지로부터 RBD 가상머신 디스크를 회수하는 도구.
+A tool that recovers RBD virtual machine disks from inactive Proxmox-Ceph OSD raw images.
 
-활성 Ceph 클러스터의 동작이나 외부 도구의 mount 없이 OSD 디스크의 raw 이미지만을 입력으로 받아, BlueStore 의 디스크 기록 사양에 근거하여 RBD 가상머신 디스크를 byte 단위로 재조립한다.
+Taking only the raw images of OSD disks as input — without an active Ceph cluster or any external tool to mount the disks — it reassembles RBD virtual machine disks byte-for-byte based on BlueStore's disk-write specification.
 
-본 도구는 학위논문 *"비활성 상태에서의 분산 객체 스토리지 데이터 회수 방안 — Proxmox-Ceph 환경을 중심으로"* (석동현, 성균관대학교 일반대학원 과학수사학과, 2026) 의 회수 절차를 단일 CLI 로 제공한다. 검증 환경은 Proxmox VE 8 · Ceph Reef 18.2.8 · 복제 정책 size=3 이며, OSD 3·4·5 개로 구성한 세 데이터셋의 12 개 가상머신에 대하여 회수 결과 SHA-256 이 원본 `rbd export` 의 SHA-256 과 일치함을 확인하였다.
+This tool provides, as a single CLI, the recovery procedure from the master's thesis *"Recovering Data from Distributed Object Storage in an Inactive State — Focused on the Proxmox-Ceph Environment"* (Donghyun Seok, Department of Forensic Science, Graduate School, Sungkyunkwan University, 2026). It was validated on Proxmox VE 8, Ceph Reef 18.2.8, and replication policy size=3. Across three datasets configured with 3, 4, and 5 OSDs, for all 12 virtual machines the SHA-256 of the recovered result matched the SHA-256 of the original `rbd export`.
 
 ---
 
-## 의존성
+## Dependencies
 
-- Python 3.11 이상
+- Python 3.11 or later
 - `pip install -r requirements.txt` (rocksdict)
 
 ---
 
-## 사용법
+## Usage
 
 ```bash
 python restore_vms.py --osd-dir /path/to/osd/raw/images --output /path/to/output
 ```
 
-- `--osd-dir` : OSD raw 이미지가 들어 있는 디렉터리. `*.001`, `*.raw`, `*.img` 파일을 자동 발견한다.
-- `--output` : 회수 결과 출력 디렉터리. 자동 생성된다.
+- `--osd-dir` : Directory containing the OSD raw images. `*.001`, `*.raw`, and `*.img` files are auto-discovered.
+- `--output` : Output directory for the recovery results. Created automatically.
+
+To recover a specific virtual machine only, pass its `image_id`:
+
+```bash
+python restore_vms.py --osd-dir ./osds --output ./recovered --image-id fbabeb6914038
+```
 
 ---
 
-## 화면 출력
+## Console output
 
-회수 절차를 진행하면서 5 단계 진행 상황을 표시하고, 마지막에 분석자 보고서에 그대로 옮길 수 있는 세 표를 출력한다.
+While running, the tool shows the progress of the five stages and, at the end, prints three tables that the analyst can copy directly into a report.
 
-- 표 1 OSD 식별 — OSD raw · ceph_fsid · osd_uuid · whoami · 상태
-- 표 2 회수된 가상머신 — image_id · vm_name · image_size · SHA-256
-- 표 3 삭제된 가상머신 잔재 — image_id · rbd_header · chunk 흔적 OSD · 흔적 chunk · 잔존 chunk
+- Table 1 — OSD identification: OSD raw, ceph_fsid, osd_uuid, whoami, status
+- Table 2 — Recovered virtual machines: image_id, vm_name, image_size, SHA-256
+- Table 3 — Deleted virtual machine residue: image_id, rbd_header, chunk-trace OSD, trace chunks, residual chunks
 
-회수된 가상머신 디스크는 `<output>/_i_results/*_union.raw` 에 저장된다. 단계별 상세 로그는 `<output>/restore_vms.log` 에 기록된다.
+Recovered virtual machine disks are saved to `<output>/_i_results/*_union.raw`. Detailed per-stage logs are written to `<output>/restore_vms.log`.
 
 ---
 
+## License
 
-## 라이선스
-
-MIT License. `LICENSE` 파일 참조.
+MIT License. See the `LICENSE` file.
